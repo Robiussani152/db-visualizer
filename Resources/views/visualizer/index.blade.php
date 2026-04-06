@@ -282,7 +282,7 @@ function render(data) {
 /* DETAIL */
 function openDetail(model) {
 
-    fetch(`/db-visualizer/detail/${encodeURIComponent(model)}`)
+    fetch(`/dbv/detail/${encodeURIComponent(model)}`)
         .then(r => r.json())
         .then(data => {
 

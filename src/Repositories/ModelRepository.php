@@ -61,7 +61,9 @@ class ModelRepository
 
             $moduleBase = $modulesPath . DIRECTORY_SEPARATOR . $module;
 
-            // Entities path
+            /**
+             * 1. Entities (existing)
+             */
             $entitiesPath = $moduleBase . DIRECTORY_SEPARATOR . 'Entities';
 
             if (is_dir($entitiesPath)) {
@@ -78,7 +80,9 @@ class ModelRepository
                 }
             }
 
-            // Optional: Models folder (some projects use it)
+            /**
+             * 2. Models (existing)
+             */
             $modelsPath = $moduleBase . DIRECTORY_SEPARATOR . 'Models';
 
             if (is_dir($modelsPath)) {
@@ -87,6 +91,25 @@ class ModelRepository
                     $class = $this->getClassFromFile(
                         $file,
                         "Modules\\{$module}\\Models"
+                    );
+
+                    if ($class && class_exists($class)) {
+                        $models[] = $class;
+                    }
+                }
+            }
+
+            /**
+             * 🔥 3. NEW: App/Models (YOUR CASE)
+             */
+            $appModelsPath = $moduleBase . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Models';
+
+            if (is_dir($appModelsPath)) {
+                foreach (File::allFiles($appModelsPath) as $file) {
+
+                    $class = $this->getClassFromFile(
+                        $file,
+                        "Modules\\{$module}\\App\\Models"
                     );
 
                     if ($class && class_exists($class)) {
