@@ -40,7 +40,7 @@ class ModelScannerService
             ];
 
             // 🔥 STEP 1: get changed files only
-            $tracker = app(\App\Services\FileChangeTrackerService::class);
+            $tracker = app(\Naimul\DbVisualizer\Services\FileChangeTrackerService::class);
             $changedFiles = $tracker->getChangedFiles($paths);
 
             // If nothing changed → return cached full result

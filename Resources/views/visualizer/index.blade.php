@@ -142,7 +142,7 @@ function loadData(search = '') {
     document.getElementById('app').innerHTML =
         `<div class="loader"><i class="fa fa-spinner fa-spin"></i> Loading...</div>`;
 
-    fetch(`/db-visualizer/data?search=${encodeURIComponent(search)}`)
+    fetch(`/dbv/data?search=${encodeURIComponent(search)}`)
         .then(r => r.json())
         .then(data => {
             globalData = Array.isArray(data) ? data : [];
