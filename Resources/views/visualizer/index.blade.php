@@ -72,7 +72,30 @@ body {
 
 <!-- STATS -->
 <div class="container-fluid mt-3">
+    <div class="row g-3 mb-3">
 
+        <div class="col-md-4">
+            <div class="card p-3">
+                <small>Laravel Version</small>
+                <h5>{{ app()->version() }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <small>PHP Version</small>
+                <h5>{{ phpversion() }}</h5>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <small>App Environment</small>
+                <h5>{{ app()->environment() }}</h5>
+            </div>
+        </div>
+
+    </div>
     <div class="row g-3 mb-3">
 
         <div class="col-md-3">
@@ -100,6 +123,64 @@ body {
             <div class="card p-3">
                 <small>Average Score</small>
                 <h4 id="avgScore">0</h4>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card mb-3">
+
+                <!-- HEADER -->
+                <div class="card-header d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#packageCollapse"
+                    style="cursor:pointer;">
+
+                    <div>
+                        <h6 class="mb-0">Installed Packages</h6>
+                        <small class="text-muted">Click to expand</small>
+                    </div>
+
+                    <i class="fa fa-chevron-down" id="packageIcon"></i>
+                </div>
+
+                <!-- COLLAPSIBLE BODY -->
+                <div id="packageCollapse" class="collapse">
+
+                    <div class="card-body">
+
+                        <div class="row g-2">
+                            @foreach($extraPackages as $pkg)
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="border rounded p-2 h-100">
+
+                                        <div class="d-flex justify-content-between">
+                                            <b style="font-size:14px;">
+                                                {{ $pkg['name'] }}
+                                            </b>
+
+                                            <span class="badge bg-dark">
+                                                {{ $pkg['version'] }}
+                                            </span>
+                                        </div>
+
+                                        @if($pkg['description'])
+                                            <small class="text-muted d-block mt-1">
+                                                {{ $pkg['description'] }}
+                                            </small>
+                                        @endif
+
+                                        @if($pkg['type'])
+                                            <span class="badge bg-secondary mt-2">
+                                                {{ $pkg['type'] }}
+                                            </span>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-12">
