@@ -4,6 +4,7 @@ namespace Naimul\DbVisualizer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Naimul\DbVisualizer\Services\ModelScannerService;
+use Illuminate\Support\Facades\Artisan;
 
 class VisualizerController extends Controller
 {
@@ -17,8 +18,48 @@ class VisualizerController extends Controller
         $this->scanner = $scanner;
     }
 
-    public function index()
+    public function clearCache()
     {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+        Artisan::call('optimize:clear');
+
+        return back()->with('success', 'Cache cleared successfully!');
+    }
+
+    public function index()
+    {        
+        $composerJson = json_decode(file_get_contents(base_path('composer.json')), true);
+        $composerLock = json_decode(file_get_contents(base_path('composer.lock')), true);
+
+        // user installed packages (direct require)
+        $requires = array_keys($composerJson['require'] ?? []);
+
+        // lock packages
+        $lockPackages = collect($composerLock['packages'] ?? []);
+
+        $extraPackages = $lockPackages
+            ->filter(function ($pkg) use ($requires) {
+                return in_array($pkg['name'], $requires);
+            })
+            ->reject(function ($pkg) {
+                // remove Laravel core
+                return $pkg['name'] === 'laravel/framework';
+            })
+            ->map(function ($pkg) {
+                return [
+                    'name' => $pkg['name'],
+                    'version' => $pkg['version'],
+                    'description' => $pkg['description'] ?? '',
+                    'type' => $pkg['type'] ?? '',
+                ];
+            })
+            ->sortBy('name')
+            ->values();
+
+        return view('dbv::visualizer.index', compact('extraPackages'));
         return view('dbv::visualizer.index');
     }
 
