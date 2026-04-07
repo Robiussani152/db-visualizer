@@ -407,7 +407,7 @@ function render(data) {
                                     ? 'warning text-dark'
                                     : 'success'
                         }">
-                            ${item.complexity ?? 'Low'}
+                            Complexity : ${item.complexity ?? 'Low'}
                         </span>
 
                     </div>

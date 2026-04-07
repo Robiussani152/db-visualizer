@@ -13,7 +13,11 @@ class SchemaRepository
 
     public function allTables()
     {
-        $tables = DB::select('SHOW TABLES');
+        $tables = DB::select("
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+        ");
 
         return array_map(function ($table) {
             return array_values((array) $table)[0];

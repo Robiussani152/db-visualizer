@@ -8,7 +8,7 @@ A powerful Laravel package to analyze your application models, relationships, da
 
 - 📊 Scan all Eloquent Models (App + Modules support)
 - 🔗 Auto-detect relationships
-- 🧠 Detect N+1 query risks
+- 🧠 Detect N+1 query risks probability
 - ❌ Find unused columns
 - ⚡ Detect missing eager loading
 - 📈 Performance scoring system (0–100)
@@ -91,7 +91,7 @@ GET /dbv/detail/User
 ### ✔ Relations
 
 * Used / unused detection
-* N+1 query detection
+* N+1 query detection probability
 * Missing eager loading
 
 ### ✔ Columns
@@ -153,7 +153,7 @@ Bonus:
 ## 🛠 Requirements
 
 * PHP >= 8.1
-* Laravel 10, 11, 12 supported
+* Laravel 10, 11, 12, 13 supported
 
 ---
 
@@ -163,20 +163,6 @@ Bonus:
 * `Modules/*/Entities`
 * `Modules/*/Models`
 * Blade Views scanning
-
----
-
-## 🚀 Usage Example
-
-```php
-use Naimul\DbVisualizer\Services\ModelScannerService;
-
-$scanner = app(ModelScannerService::class);
-
-$data = $scanner->scan();
-
-return $data;
-```
 
 ---
 
@@ -194,10 +180,9 @@ This package is useful for:
 
 ## 🧩 Future Plans
 
-* CLI command (`php artisan dbv:scan`)
-* UI dashboard (Telescope-like)
-* Graph visualization
-* GitHub Action integration
+* N+1 Query file locate
+* eagerloading File locate
+* Performance booster
 
 ---
 
@@ -209,7 +194,7 @@ Pull requests are welcome. For major changes, please open an issue first.
 
 ## 📜 License
 
-MIT License © Naimul Islam
+MIT License © Open Source
 
 ---
 
