@@ -24,13 +24,19 @@ class RelationshipResolverService
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
 
             // Only model's own methods
-            if ($method->class !== get_class($model)) continue;
+            if ($method->class !== get_class($model)) {
+                continue;
+            }
 
             // Skip methods with parameters
-            if ($method->getNumberOfParameters() > 0) continue;
+            if ($method->getNumberOfParameters() > 0) {
+                continue;
+            }
 
             // Skip magic methods
-            if (str_starts_with($method->getName(), '__')) continue;
+            if (str_starts_with($method->getName(), '__')) {
+                continue;
+            }
 
             try {
 
@@ -57,7 +63,7 @@ class RelationshipResolverService
                         // intelligence data
                         'used' => $isUsed,
                         'n_plus_one' => $nPlusOne,
-                        'missing_eager' => $isUsed && !$isEagerLoaded,
+                        'missing_eager' => $isUsed && ! $isEagerLoaded,
                     ];
                 }
 

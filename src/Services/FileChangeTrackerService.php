@@ -17,13 +17,15 @@ class FileChangeTrackerService
         $changedFiles = [];
 
         foreach ($paths as $path) {
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
             foreach (File::allFiles($path) as $file) {
 
                 if (
                     $file->getExtension() !== 'php' &&
-                    !$this->isBlade($file)
+                    ! $this->isBlade($file)
                 ) {
                     continue;
                 }
@@ -33,7 +35,7 @@ class FileChangeTrackerService
 
                 $current[$filePath] = $hash;
 
-                if (!isset($previous[$filePath]) || $previous[$filePath] !== $hash) {
+                if (! isset($previous[$filePath]) || $previous[$filePath] !== $hash) {
                     $changedFiles[] = $filePath;
                 }
             }

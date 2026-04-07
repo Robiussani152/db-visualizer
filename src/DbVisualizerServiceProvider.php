@@ -11,7 +11,7 @@ class DbVisualizerServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
 
-        if (!config('db-visualizer.enabled')) {
+        if (! config('db-visualizer.enabled')) {
             return;
         }
 

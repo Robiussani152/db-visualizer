@@ -39,6 +39,29 @@ Naimul\DbVisualizer\DbVisualizerServiceProvider::class,
 
 ---
 
+## 🗂 Publishing Configuration
+
+To customize the package's configuration, publish the config file with:
+
+```bash
+php artisan vendor:publish --provider="Naimul\DbVisualizer\DbVisualizerServiceProvider" --tag="config"
+```
+
+This will create a `db-visualizer.php` config file in your `config` directory.
+
+## 🗃 Publishing Assets (Views, JS, CSS)
+
+To publish the package's frontend resources (views, JS, CSS), run:
+
+```bash
+php artisan vendor:publish --provider="Naimul\DbVisualizer\DbVisualizerServiceProvider" --tag="resources"
+```
+
+This will copy the package's resources into your application's `resources/vendor/db-visualizer` directory for customization.
+
+
+
+
 ## 🌐 Routes
 
 After installation, visit:

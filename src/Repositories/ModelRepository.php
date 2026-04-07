@@ -25,7 +25,7 @@ class ModelRepository
         $models = [];
         $path = app_path('Models');
 
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             return [];
         }
 
@@ -49,7 +49,7 @@ class ModelRepository
         $models = [];
         $modulesPath = base_path('Modules');
 
-        if (!is_dir($modulesPath)) {
+        if (! is_dir($modulesPath)) {
             return [];
         }
 
@@ -57,14 +57,16 @@ class ModelRepository
 
         foreach ($modules as $module) {
 
-            if ($module === '.' || $module === '..') continue;
+            if ($module === '.' || $module === '..') {
+                continue;
+            }
 
-            $moduleBase = $modulesPath . DIRECTORY_SEPARATOR . $module;
+            $moduleBase = $modulesPath.DIRECTORY_SEPARATOR.$module;
 
             /**
              * 1. Entities (existing)
              */
-            $entitiesPath = $moduleBase . DIRECTORY_SEPARATOR . 'Entities';
+            $entitiesPath = $moduleBase.DIRECTORY_SEPARATOR.'Entities';
 
             if (is_dir($entitiesPath)) {
                 foreach (File::allFiles($entitiesPath) as $file) {
@@ -83,7 +85,7 @@ class ModelRepository
             /**
              * 2. Models (existing)
              */
-            $modelsPath = $moduleBase . DIRECTORY_SEPARATOR . 'Models';
+            $modelsPath = $moduleBase.DIRECTORY_SEPARATOR.'Models';
 
             if (is_dir($modelsPath)) {
                 foreach (File::allFiles($modelsPath) as $file) {
@@ -102,7 +104,7 @@ class ModelRepository
             /**
              * 3. NEW: App/Models (YOUR CASE)
              */
-            $appModelsPath = $moduleBase . DIRECTORY_SEPARATOR . 'App' . DIRECTORY_SEPARATOR . 'Models';
+            $appModelsPath = $moduleBase.DIRECTORY_SEPARATOR.'App'.DIRECTORY_SEPARATOR.'Models';
 
             if (is_dir($appModelsPath)) {
                 foreach (File::allFiles($appModelsPath) as $file) {
@@ -112,12 +114,12 @@ class ModelRepository
                         "Modules\\{$module}\\App\\Models"
                     );
                     $anotherClass = $this->getClassFromFile(
-                                        $file,
-                                        "Modules\\{$module}\\Models"
-                                    );
+                        $file,
+                        "Modules\\{$module}\\Models"
+                    );
                     if ($class && class_exists($class)) {
                         $models[] = $class;
-                    } 
+                    }
                     if ($anotherClass && class_exists($anotherClass)) {
                         $models[] = $anotherClass;
                     }
@@ -135,6 +137,6 @@ class ModelRepository
     {
         $filename = $file->getFilenameWithoutExtension();
 
-        return $baseNamespace . '\\' . $filename;
+        return $baseNamespace.'\\'.$filename;
     }
 }

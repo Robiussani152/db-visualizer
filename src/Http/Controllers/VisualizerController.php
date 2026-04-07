@@ -42,7 +42,7 @@ class VisualizerController extends Controller
 
         return response()->json([
             'data' => $data,
-            'meta' => $meta
+            'meta' => $meta,
         ]);
     }
 
@@ -54,7 +54,7 @@ class VisualizerController extends Controller
 
         $data = collect($models)->firstWhere('model', $model);
 
-        if (!$data) {
+        if (! $data) {
             return response()->json(['message' => 'Model not found'], 404);
         }
 

@@ -2,15 +2,19 @@
 
 namespace Naimul\DbVisualizer\Services;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Naimul\DbVisualizer\Repositories\ModelRepository;
 use Naimul\DbVisualizer\Repositories\SchemaRepository;
-use Illuminate\Support\Facades\Cache;
 
 class ModelScannerService
 {
     protected $models;
+
     protected $schema;
+
     protected $relations;
+
     protected $usageAnalyzer;
 
     public function __construct(
@@ -24,8 +28,6 @@ class ModelScannerService
         $this->relations = $relations;
         $this->usageAnalyzer = $usageAnalyzer;
     }
-
-    
 
     public function scan()
     {
@@ -41,7 +43,7 @@ class ModelScannerService
                 base_path('Modules'),
             ];
 
-            $tracker = app(\Naimul\DbVisualizer\Services\FileChangeTrackerService::class);
+            $tracker = app(FileChangeTrackerService::class);
             $changedFiles = $tracker->getChangedFiles($paths);
 
             if (empty($changedFiles)) {
@@ -56,7 +58,9 @@ class ModelScannerService
                 try {
                     $model = new $modelClass;
 
-                    if (!method_exists($model, 'getTable')) continue;
+                    if (! method_exists($model, 'getTable')) {
+                        continue;
+                    }
 
                     $table = $model->getTable();
 
@@ -94,7 +98,7 @@ class ModelScannerService
                     'total_tables' => count($allTables),
                     'orphan_tables_count' => count($orphanTables),
                     'orphan_tables' => $orphanTables,
-                ]
+                ],
             ];
 
             Cache::put('db_visualizer_last_full_result', $final, now()->addDays(7));
@@ -106,10 +110,11 @@ class ModelScannerService
     private function hasSoftDeletes($model)
     {
         return in_array(
-            \Illuminate\Database\Eloquent\SoftDeletes::class,
+            SoftDeletes::class,
             class_uses_recursive($model)
         );
     }
+
     protected function generateProjectHash(): string
     {
         $paths = [
@@ -122,19 +127,23 @@ class ModelScannerService
 
         foreach ($paths as $path) {
 
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
             foreach (new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($path)
             ) as $file) {
 
-                if ($file->isDir()) continue;
-
-                if (!in_array($file->getExtension(), ['php', 'blade.php'])) {
+                if ($file->isDir()) {
                     continue;
                 }
 
-                $hashString .= $file->getPathname() . ':' . $file->getMTime() . ';';
+                if (! in_array($file->getExtension(), ['php', 'blade.php'])) {
+                    continue;
+                }
+
+                $hashString .= $file->getPathname().':'.$file->getMTime().';';
             }
         }
 
