@@ -9,4 +9,10 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+
+    <php>
+        <env name="APP_KEY" value="base64:YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="/>
+        <env name="DB_VISUALIZER_ENABLED" value="true"/>
+        <env name="DB_VISUALIZER_PATH" value="dbv"/>
+    </php>
 </phpunit>
