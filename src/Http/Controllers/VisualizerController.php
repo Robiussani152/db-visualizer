@@ -42,7 +42,7 @@ class VisualizerController extends Controller
 
         $extraPackages = $lockPackages
             ->filter(function ($pkg) use ($requires) {
-                return in_array($pkg['name'], $requires);
+                return in_array($pkg['name'], $requires, true);
             })
             ->reject(function ($pkg) {
                 // remove Laravel core

@@ -44,6 +44,7 @@ class RelationUsageAnalyzerService
                 $paths[] = $modulePath;
 
                 $views = $modulePath.'/Resources/views';
+
                 if (is_dir($views)) {
                     $paths[] = $views;
                 }
@@ -247,9 +248,11 @@ class RelationUsageAnalyzerService
                 if (! $relation['used']) {
                     $unusedRelations++;
                 }
+
                 if ($relation['n_plus_one']) {
                     $nPlusOne++;
                 }
+
                 if ($relation['missing_eager']) {
                     $missingEager++;
                 }
@@ -302,9 +305,11 @@ class RelationUsageAnalyzerService
             if (! empty($model['soft_deletes'])) {
                 $score += 5;
             }
+
             if ($this->isCacheUsed()) {
                 $score += 5;
             }
+
             if ($this->usesApiResource($model['model'])) {
                 $score += 5;
             }

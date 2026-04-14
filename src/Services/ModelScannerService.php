@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Naimul\DbVisualizer\Repositories\ModelRepository;
 use Naimul\DbVisualizer\Repositories\SchemaRepository;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Throwable;
 
 class ModelScannerService
 {
@@ -73,7 +76,7 @@ class ModelScannerService
                         'soft_deletes' => $this->hasSoftDeletes($model),
                     ];
 
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     continue;
                 }
             }
@@ -111,7 +114,7 @@ class ModelScannerService
     {
         return in_array(
             SoftDeletes::class,
-            class_uses_recursive($model)
+            class_uses_recursive($model), true
         );
     }
 
@@ -131,15 +134,15 @@ class ModelScannerService
                 continue;
             }
 
-            foreach (new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path)
+            foreach (new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($path)
             ) as $file) {
 
                 if ($file->isDir()) {
                     continue;
                 }
 
-                if (! in_array($file->getExtension(), ['php', 'blade.php'])) {
+                if (! in_array($file->getExtension(), ['php', 'blade.php'], true)) {
                     continue;
                 }
 

@@ -5,6 +5,7 @@ namespace Naimul\DbVisualizer\Services;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionClass;
 use ReflectionMethod;
+use Throwable;
 
 class RelationshipResolverService
 {
@@ -67,7 +68,7 @@ class RelationshipResolverService
                     ];
                 }
 
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // silently skip broken methods
                 continue;
             }

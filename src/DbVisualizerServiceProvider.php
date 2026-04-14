@@ -20,6 +20,7 @@ class DbVisualizerServiceProvider extends ServiceProvider
         ]);
 
         $this->registerRoutes();
+        $this->registerAssetRoutes();
         $this->registerResources();
     }
 
@@ -43,7 +44,31 @@ class DbVisualizerServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/dbv'),
             ], 'dbv-resources');
+
         }
+    }
+
+    /**
+     * Register routes that serve the package's static assets (CSS/JS).
+     * Assets are served directly from the package — no publishing required.
+     */
+    protected function registerAssetRoutes(): void
+    {
+        Route::get(config('db-visualizer.path').'/assets/{type}/{file}', function (string $type, string $file) {
+            $mimeTypes = [
+                'css' => 'text/css',
+                'js' => 'application/javascript',
+            ];
+
+            abort_unless(isset($mimeTypes[$type]), 404);
+
+            $resourceBase = realpath(__DIR__.'/../resources');
+            $path = realpath("{$resourceBase}/{$type}/{$file}");
+
+            abort_if($path === false || ! str_starts_with($path, $resourceBase), 404);
+
+            return response()->file($path, ['Content-Type' => $mimeTypes[$type]]);
+        })->name('visualizer.assets');
     }
 
     /**

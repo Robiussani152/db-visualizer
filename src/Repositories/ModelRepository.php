@@ -117,9 +117,11 @@ class ModelRepository
                         $file,
                         "Modules\\{$module}\\Models"
                     );
+
                     if ($class && class_exists($class)) {
                         $models[] = $class;
                     }
+
                     if ($anotherClass && class_exists($anotherClass)) {
                         $models[] = $anotherClass;
                     }
