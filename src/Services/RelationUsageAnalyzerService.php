@@ -88,28 +88,30 @@ class RelationUsageAnalyzerService
     ========================= */
     public function isRelationUsed(string $relation): bool
     {
+        $q = preg_quote($relation, '/');
+
         foreach ($this->getAllFiles() as $content) {
 
             $content = $this->removeComments($content);
 
             if (
                 // with('relation')
-                preg_match("/with\(\s*['\"]{$relation}['\"]\s*\)/", $content) ||
+                preg_match('/with\(\s*[\'"]'.$q.'[\'"]\s*\)/', $content) ||
 
                 // with(['relation'])
-                preg_match("/with\(\s*\[.*['\"]{$relation}['\"].*\]\s*\)/s", $content) ||
+                preg_match('/with\(\s*\[.*[\'"]'.$q.'[\'"].*\]\s*\)/s', $content) ||
 
                 // whereHas('relation')
-                preg_match("/whereHas\(\s*['\"]{$relation}['\"]\s*\)/", $content) ||
+                preg_match('/whereHas\(\s*[\'"]'.$q.'[\'"]\s*\)/', $content) ||
 
                 // load('relation')
-                preg_match("/load\(\s*['\"]{$relation}['\"]\s*\)/", $content) ||
+                preg_match('/load\(\s*[\'"]'.$q.'[\'"]\s*\)/', $content) ||
 
                 // withCount('relation')
-                preg_match("/withCount\(\s*['\"]{$relation}['\"]\s*\)/", $content) ||
+                preg_match('/withCount\(\s*[\'"]'.$q.'[\'"]\s*\)/', $content) ||
 
                 // direct access ->relation
-                preg_match("/->{$relation}\b/", $content)
+                preg_match('/->'.$q.'\b/', $content)
             ) {
                 return true;
             }
@@ -127,15 +129,17 @@ class RelationUsageAnalyzerService
             return true;
         }
 
+        $q = preg_quote($column, '/');
+
         foreach ($this->getAllFiles() as $content) {
 
             $content = $this->removeComments($content);
 
             if (
-                preg_match("/->{$column}\b/", $content) ||
-                preg_match("/['\"]{$column}['\"]/", $content) ||
-                preg_match("/orderBy\(['\"]{$column}['\"]\)/", $content) ||
-                preg_match("/where\(['\"]{$column}['\"]\)/", $content)
+                preg_match('/->'.$q.'\b/', $content) ||
+                preg_match('/[\'"]'.$q.'[\'"]/', $content) ||
+                preg_match('/orderBy\([\'"]'.$q.'[\'"]\)/', $content) ||
+                preg_match('/where\([\'"]'.$q.'[\'"]\)/', $content)
             ) {
                 return true;
             }
@@ -149,6 +153,8 @@ class RelationUsageAnalyzerService
     ========================= */
     public function detectNPlusOne(string $relation): bool
     {
+        $q = preg_quote($relation, '/');
+
         foreach ($this->getAllFiles() as $content) {
 
             if (! str_contains($content, $relation)) {
@@ -160,12 +166,12 @@ class RelationUsageAnalyzerService
             $hasLoop = preg_match('/foreach\s*\(.*\)\s*\{/', $clean);
 
             $hasRelationInLoop = preg_match(
-                "/foreach\s*\(.*\)\s*\{[^}]*->{$relation}\b/s",
+                '/foreach\s*\(.*\)\s*\{[^}]*->'.$q.'\b/s',
                 $clean
             );
 
             $hasEagerLoad = preg_match(
-                "/with\(\s*['\"]{$relation}['\"]\s*\)/",
+                '/with\(\s*[\'"]'.$q.'[\'"]\s*\)/',
                 $clean
             );
 
@@ -182,8 +188,10 @@ class RelationUsageAnalyzerService
     ========================= */
     public function isEagerLoaded(string $relation): bool
     {
+        $q = preg_quote($relation, '/');
+
         foreach ($this->getAllFiles() as $content) {
-            if (preg_match("/with\(\s*['\"]{$relation}['\"]\s*\)/", $content)) {
+            if (preg_match('/with\(\s*[\'"]'.$q.'[\'"]\s*\)/', $content)) {
                 return true;
             }
         }

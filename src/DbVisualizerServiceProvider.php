@@ -84,7 +84,7 @@ class DbVisualizerServiceProvider extends ServiceProvider
                 $resourceBase = realpath(__DIR__.'/../resources');
                 $path = realpath("{$resourceBase}/{$type}/{$file}");
 
-                abort_if($path === false || ! str_starts_with($path, $resourceBase), 404);
+                abort_if($path === false || ! str_starts_with($path, $resourceBase.DIRECTORY_SEPARATOR), 404);
 
                 return response()->file($path, ['Content-Type' => $mimeTypes[$type]]);
             })->name('visualizer.assets');
