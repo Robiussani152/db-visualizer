@@ -12,9 +12,6 @@ class VisualizerController extends Controller
 
     public function __construct(ModelScannerService $scanner)
     {
-        if (app()->environment(['production', 'staging'])) {
-            abort(403, 'DB Visualizer disabled');
-        }
         $this->scanner = $scanner;
     }
 
