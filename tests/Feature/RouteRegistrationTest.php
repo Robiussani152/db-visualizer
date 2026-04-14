@@ -12,9 +12,9 @@ describe('route registration', function () {
 
         expect($routes)
             ->toContain('visualizer.index')
-            ->toContain('visualizer.data')
-            ->toContain('visualizer.detail')
-            ->toContain('visualizer.clear-cache');
+            ->toContain('visualizer.models')
+            ->toContain('visualizer.models.show')
+            ->toContain('visualizer.cache.clear');
     });
 
     it('registers the asset route', function () {

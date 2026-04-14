@@ -20,7 +20,7 @@
     </div>
 
     <div class="topbar-right">
-        <form method="POST" action="{{ route('visualizer.clear-cache') }}">
+        <form method="POST" action="{{ route('visualizer.cache.clear') }}">
             @csrf
             <button type="submit" class="btn-cache">
                 <i class="fa fa-broom me-1"></i> Clear Cache
@@ -143,8 +143,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const dbvDataUrl   = @json(route('visualizer.data'));
-    const dbvDetailUrl = @json(route('visualizer.detail', ['model' => '__MODEL__']));
+    const dbvDataUrl   = @json(route('visualizer.models'));
+    const dbvDetailUrl = @json(route('visualizer.models.show', ['model' => '__MODEL__']));
 </script>
 <script src="{{ route('visualizer.assets', ['type' => 'js', 'file' => 'visualizer.js']) }}"></script>
 
