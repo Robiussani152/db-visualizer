@@ -5,6 +5,7 @@ namespace Naimul\DbVisualizer;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Naimul\DbVisualizer\Console\Commands\ClearCacheCommand;
 
 class DbVisualizerServiceProvider extends ServiceProvider
 {
@@ -61,6 +62,10 @@ class DbVisualizerServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/dbv'),
             ], 'dbv-resources');
+
+            $this->commands([
+                ClearCacheCommand::class,
+            ]);
         }
     }
 
