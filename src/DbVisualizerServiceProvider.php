@@ -2,16 +2,19 @@
 
 namespace Naimul\DbVisualizer;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Naimul\DbVisualizer\Console\Commands\ClearCacheCommand;
 
 class DbVisualizerServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
         $this->registerPublishing();
+        $this->authorization();
 
-        if (!config('db-visualizer.enabled')) {
+        if (! config('db-visualizer.enabled')) {
             return;
         }
 
@@ -20,6 +23,7 @@ class DbVisualizerServiceProvider extends ServiceProvider
         ]);
 
         $this->registerRoutes();
+        $this->registerAssetRoutes();
         $this->registerResources();
     }
 
@@ -29,11 +33,26 @@ class DbVisualizerServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the package's publishable resources.
+     * Define the default authorization gate.
      *
-     * @return void
+     * By default, access is granted in local environment only.
+     * Override in your AppServiceProvider to customise:
+     *
+     *   Gate::define('viewDbVisualizer', fn (?User $user) => true);
      */
-    protected function registerPublishing()
+    protected function authorization(): void
+    {
+        if (! Gate::has('viewDbVisualizer')) {
+            Gate::define('viewDbVisualizer', function (?object $user) {
+                return $this->app->environment('local');
+            });
+        }
+    }
+
+    /**
+     * Register the package's publishable resources.
+     */
+    protected function registerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -42,21 +61,50 @@ class DbVisualizerServiceProvider extends ServiceProvider
 
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/dbv'),
-            ], 'dbv-views');
+            ], 'dbv-resources');
+
+            $this->commands([
+                ClearCacheCommand::class,
+            ]);
         }
     }
 
     /**
-     * Register the package routes.
-     *
-     * @return void
+     * Register routes that serve the package's static assets (CSS/JS).
+     * Assets are served directly from the package — no publishing required.
      */
-    protected function registerRoutes()
+    protected function registerAssetRoutes(): void
     {
         Route::group([
             'domain' => config('db-visualizer.domain', null),
-            'namespace' => 'Naimul\DbVisualizer\Http\Controllers',
+        ], function () {
+            Route::get(config('db-visualizer.path').'/assets/{type}/{file}', function (string $type, string $file) {
+                $mimeTypes = [
+                    'css' => 'text/css',
+                    'js' => 'application/javascript',
+                ];
+
+                abort_unless(isset($mimeTypes[$type]), 404);
+
+                $resourceBase = realpath(__DIR__.'/../resources');
+                $path = realpath("{$resourceBase}/{$type}/{$file}");
+
+                abort_if($path === false || ! str_starts_with($path, $resourceBase.DIRECTORY_SEPARATOR), 404);
+
+                return response()->file($path, ['Content-Type' => $mimeTypes[$type]]);
+            })->name('visualizer.assets');
+        });
+    }
+
+    /**
+     * Register the package routes.
+     */
+    protected function registerRoutes(): void
+    {
+        Route::group([
+            'domain' => config('db-visualizer.domain', null),
             'prefix' => config('db-visualizer.path'),
+            'as' => 'visualizer.',
             'middleware' => 'db-visualizer',
         ], function () {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
@@ -65,11 +113,9 @@ class DbVisualizerServiceProvider extends ServiceProvider
 
     /**
      * Register the DB Visualizer resources.
-     *
-     * @return void
      */
-    protected function registerResources()
+    protected function registerResources(): void
     {
-        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'dbv');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'dbv');
     }
 }

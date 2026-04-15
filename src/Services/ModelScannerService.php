@@ -2,15 +2,22 @@
 
 namespace Naimul\DbVisualizer\Services;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Naimul\DbVisualizer\Repositories\ModelRepository;
 use Naimul\DbVisualizer\Repositories\SchemaRepository;
-use Illuminate\Support\Facades\Cache;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Throwable;
 
 class ModelScannerService
 {
     protected $models;
+
     protected $schema;
+
     protected $relations;
+
     protected $usageAnalyzer;
 
     public function __construct(
@@ -25,13 +32,11 @@ class ModelScannerService
         $this->usageAnalyzer = $usageAnalyzer;
     }
 
-    
-
     public function scan()
     {
-        $cacheKey = 'db_visualizer_incremental_v1';
+        $cacheKey = config('db-visualizer.cache_key');
 
-        return Cache::remember($cacheKey, 3600, function () {
+        return Cache::remember($cacheKey, config('db-visualizer.cache_ttl'), function () {
 
             $data = [];
 
@@ -41,11 +46,11 @@ class ModelScannerService
                 base_path('Modules'),
             ];
 
-            $tracker = app(\Naimul\DbVisualizer\Services\FileChangeTrackerService::class);
+            $tracker = app(FileChangeTrackerService::class);
             $changedFiles = $tracker->getChangedFiles($paths);
 
             if (empty($changedFiles)) {
-                return Cache::get('db_visualizer_last_full_result', []);
+                return Cache::get(config('db-visualizer.cache_key').'_full_result', []);
             }
 
             // LOAD MODELS
@@ -56,7 +61,9 @@ class ModelScannerService
                 try {
                     $model = new $modelClass;
 
-                    if (!method_exists($model, 'getTable')) continue;
+                    if (! method_exists($model, 'getTable')) {
+                        continue;
+                    }
 
                     $table = $model->getTable();
 
@@ -69,7 +76,7 @@ class ModelScannerService
                         'soft_deletes' => $this->hasSoftDeletes($model),
                     ];
 
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     continue;
                 }
             }
@@ -94,10 +101,10 @@ class ModelScannerService
                     'total_tables' => count($allTables),
                     'orphan_tables_count' => count($orphanTables),
                     'orphan_tables' => $orphanTables,
-                ]
+                ],
             ];
 
-            Cache::put('db_visualizer_last_full_result', $final, now()->addDays(7));
+            Cache::put(config('db-visualizer.cache_key').'_full_result', $final, now()->addDays(7));
 
             return $final;
         });
@@ -106,10 +113,11 @@ class ModelScannerService
     private function hasSoftDeletes($model)
     {
         return in_array(
-            \Illuminate\Database\Eloquent\SoftDeletes::class,
-            class_uses_recursive($model)
+            SoftDeletes::class,
+            class_uses_recursive($model), true
         );
     }
+
     protected function generateProjectHash(): string
     {
         $paths = [
@@ -122,19 +130,23 @@ class ModelScannerService
 
         foreach ($paths as $path) {
 
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
-            foreach (new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path)
+            foreach (new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($path)
             ) as $file) {
 
-                if ($file->isDir()) continue;
-
-                if (!in_array($file->getExtension(), ['php', 'blade.php'])) {
+                if ($file->isDir()) {
                     continue;
                 }
 
-                $hashString .= $file->getPathname() . ':' . $file->getMTime() . ';';
+                if (! in_array($file->getExtension(), ['php', 'blade.php'], true)) {
+                    continue;
+                }
+
+                $hashString .= $file->getPathname().':'.$file->getMTime().';';
             }
         }
 

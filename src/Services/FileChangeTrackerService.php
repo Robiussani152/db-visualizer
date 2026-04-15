@@ -7,7 +7,12 @@ use Illuminate\Support\Facades\File;
 
 class FileChangeTrackerService
 {
-    protected string $cacheKey = 'model_scan_file_hash_v1';
+    protected string $cacheKey;
+
+    public function __construct()
+    {
+        $this->cacheKey = config('db-visualizer.cache_key').'_file_hash';
+    }
 
     public function getChangedFiles(array $paths): array
     {
@@ -17,13 +22,15 @@ class FileChangeTrackerService
         $changedFiles = [];
 
         foreach ($paths as $path) {
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
             foreach (File::allFiles($path) as $file) {
 
                 if (
                     $file->getExtension() !== 'php' &&
-                    !$this->isBlade($file)
+                    ! $this->isBlade($file)
                 ) {
                     continue;
                 }
@@ -33,7 +40,7 @@ class FileChangeTrackerService
 
                 $current[$filePath] = $hash;
 
-                if (!isset($previous[$filePath]) || $previous[$filePath] !== $hash) {
+                if (! isset($previous[$filePath]) || $previous[$filePath] !== $hash) {
                     $changedFiles[] = $filePath;
                 }
             }

@@ -1,5 +1,7 @@
 <?php
 
+use Naimul\DbVisualizer\Http\Middleware\Authorize;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -43,6 +45,7 @@ return [
 
     'middleware' => [
         'web',
+        Authorize::class,
     ],
 
     /*

@@ -1,8 +1,9 @@
 <?php
+
 namespace Naimul\DbVisualizer\Repositories;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SchemaRepository
 {
